@@ -1,0 +1,27 @@
+# 環境變數（絕對不要 commit 真實金鑰）
+.env
+
+# Python 快取
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# 虛擬環境
+venv/
+.venv/
+env/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# 日誌
+*.log

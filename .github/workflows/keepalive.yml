@@ -1,0 +1,16 @@
+name: Keepalive
+
+# 防止 GitHub 因 repo 60 天無 commit 而自動停用排程 workflow
+on:
+  schedule:
+    - cron: '0 0 1 * *'   # 每月 1 號午夜執行一次
+  workflow_dispatch:        # 也允許手動觸發
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gautamkrishnar/keepalive-workflow@v2
+        with:
+          use_api: true

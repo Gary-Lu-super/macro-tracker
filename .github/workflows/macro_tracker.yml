@@ -1,0 +1,52 @@
+name: US Macro Data Tracker
+
+on:
+  schedule:
+    # ============================================================
+    # 主要排程：週一至週五 9:00 AM US Eastern（14:00 UTC）
+    # 大多數經濟指標於 8:30 AM ET 發布，預留 30 分鐘讓 FRED 更新數據
+    # ============================================================
+    - cron: '0 14 * * 1-5'
+
+    # FOMC 決議日額外排程（通常週三 2:00 PM ET = 19:00 UTC）
+    - cron: '0 19 * * 3'
+
+  # 允許手動觸發（用於測試）
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: '手動執行原因'
+        required: false
+        default: 'Manual trigger for testing'
+
+# 防止同時執行多個 job
+concurrency:
+  group: macro-tracker
+  cancel-in-progress: false
+
+jobs:
+  fetch-and-write:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run macro tracker
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: python macro_tracker.py
